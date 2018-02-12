@@ -35,9 +35,30 @@
 
     self.speechRecognizer.delegate = self;
 
+    /*----------
     NSError* audioSessionError = nil;
     self.audioSession = [AVAudioSession sharedInstance];
 
+    if (audioSessionError != nil) {
+        [self sendResult:RCTMakeError([audioSessionError localizedDescription], nil, nil) :nil :nil :nil];
+        return;
+    }
+    ----------*/
+
+    NSError* audioSessionError = nil;
+    self.audioSession = [AVAudioSession sharedInstance];
+    [self.audioSession setCategory:AVAudioSessionCategoryRecord error:&audioSessionError];
+    
+    if (audioSessionError != nil) {
+        [self sendResult:RCTMakeError([audioSessionError localizedDescription], nil, nil) :nil :nil :nil];
+        return;
+    }
+    [self.audioSession setMode:AVAudioSessionModeMeasurement error:&audioSessionError];
+    if (audioSessionError != nil) {
+        [self sendResult:RCTMakeError([audioSessionError localizedDescription], nil, nil) :nil :nil :nil];
+        return;
+    }
+    [self.audioSession setActive:YES withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:&audioSessionError];
     if (audioSessionError != nil) {
         [self sendResult:RCTMakeError([audioSessionError localizedDescription], nil, nil) :nil :nil :nil];
         return;
